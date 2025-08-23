@@ -1715,7 +1715,7 @@
       {"any": "vblendpd W:xy, xy, xy/mxy, imm8"                            , "op": "[RVM] VEX.Lxy.66.0F3A.WIG 0D /r ib"},
       {"any": "vblendps W:xy, xy, xy/mxy, imm8"                            , "op": "[RVM] VEX.Lxy.66.0F3A.WIG 0C /r ib"},
       {"any": "vblendvpd W:xy, xy, xy/mxy, xy"                             , "op": "[RVMS]VEX.Lxy.66.0F3A.W0 4B /r /is4"},
-      {"any": "vblendvps W:xy, xy, xy/mxy, xy"                             , "op": "[RVMS]VEX.Lxy.66.0F3A.W0 4A /r /is4"},
+      {"any": "vblendvps W:xy, xy, xy/mbxy, xy"                             , "op": "[RVMS]VEX.Lxy.66.0F3A.W0 4A /r /is4"},
       {"any": "vbroadcastf128 W:ymm, m128"                                 , "op": "[RM ] VEX.256.66.0F38.W0 1A /r"},
       {"any": "vbroadcastsd W:ymm, m64"                                    , "op": "[RM ] VEX.256.66.0F38.W0 19 /r"},
       {"any": "vbroadcastss W:xy, m32"                                     , "op": "[RM ] VEX.Lxy.66.0F38.W0 18 /r"},
