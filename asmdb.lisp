@@ -35,7 +35,7 @@
   (assoc :instructions *foo*))
 
 (defparameter *example*
-  (assocr :instructions (second *instructions*)))
+  (assocr :instructions (nth 3 *instructions*)))
 
 (defparameter *thing* (first *example*))
 
