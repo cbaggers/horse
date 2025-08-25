@@ -37,7 +37,9 @@
 (defparameter *example*
   (assocr :instructions (nth 3 *instructions*)))
 
-(defparameter *thing* (first *example*))
+(defun try-stuff (n)
+  (mapcar #'process-thing
+          (assocr :instructions (nth n *instructions*))))
 
 
 (defun process-thing (thing)
@@ -101,20 +103,57 @@
                       (handler-case (parse-integer x)
                         (error () (intern x :keyword))))))
 
+(defun trim (str)
+  (string-trim '(#\space #\tab) str))
+
 (defun parse-encoding (op-str)
-  (let* ((header (when (eql #\[ (aref op-str 0))
-                   (subseq op-str 0 4)))
-         (op-str (if header
-                     (subseq op-str 4)
-                     op-str)))
-    (let* ((rest-split (uiop:split-string op-str))
-           (rex-w (equal (first rest-split) "REX.W"))
-           (rest-split (if rex-w
-                           (rest rest-split)
-                           rest-split)))
-      (list header
-            rex-w
-            rest-split))))
+  (multiple-value-bind (wip-header op-str) (split-right #\] op-str)
+    (let* ((header (when wip-header
+                     (subseq wip-header 1))))
+      (let* ((rest-split (uiop:split-string (trim op-str)))
+             (rex-w (equal (first rest-split) "REX.W"))
+             (rest-split (if rex-w
+                             (rest rest-split)
+                             rest-split))
+             (bytes-and-other (mapcar #'parse-op-part rest-split))
+             (other-start (position-if #'keywordp bytes-and-other))
+             (op-bytes (if other-start
+                           (subseq bytes-and-other 0 other-start)
+                           bytes-and-other))
+             (other (when other-start
+                      (subseq bytes-and-other other-start))))
+        (list :header header
+              :rex-w rex-w
+              :op-bytes op-bytes
+              :todo other)))))
+
+(defun parse-op-part (x)
+  (multiple-value-bind (a b) (split-left #\+ x)
+    (handler-case
+        (let ((i (parse-integer a :radix 16)))
+          (declare (ignore i))
+          (if b
+              (list a (cond
+                        ((equal b "r") :r)
+                        (t (error "beans"))))
+              a))
+      (error () (parse-encoding-other x)))))
+
+(defun parse-encoding-other (str)
+  (cond
+    ((char= (aref str 0) #\/)
+     (if (char= (aref str 1) #\r)
+         (list :modrm-contains-register-and-rm-operand t)
+         (let ((int (parse-integer (subseq str 1))))
+           (list :only-use-rm int))))
+    ((equal str "cw") :cw)
+    ((equal str "ib") :ib)
+    ((equal str "id") :id)
+    ((equal str "iq") :iq)
+    ((equal str "iv") :iv)
+    ((equal str "iw") :iw)
+    ((equal str "moff") :moff)
+    (t (error "blerp"))))
 
 (defparameter *registers*
   '(("al" . :al)
@@ -243,12 +282,11 @@
             ("m16_16" . :m16_16)
             ("m16_32" . :m16_32)
             ("m16_64" . :m16_64)
+
             ("moff8" . :moff8)
             ("moff16" . :moff16)
             ("moff32" . :moff32)
-            ("moff64" . :moff64)
-
-            )))
+            ("moff64" . :moff64))))
 
 
 (defparameter *operand-access*
