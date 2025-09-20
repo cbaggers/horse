@@ -648,3 +648,7 @@
 ;;                           (setf (gethash it horse) 1)))))
 ;; 	   (gethash '|_instructionMap| *x64*))
 ;;   (maphash (lambda (k v) v (print k)) horse))
+
+(defun get-instructions (name)
+  (gethash (intern (string-downcase (string name)))
+           (gethash '|_instructionMap| *x64*)))
