@@ -164,7 +164,7 @@
    |aliasNames|
    |format|))
 
-(defclass |category| ()
+(defclass |category| () ;; all slots are T if category applies to the instruction
   (|AMX|
    |AVX|
    |AVX10_2|
@@ -196,48 +196,109 @@
 
 (defclass |special-regs| () ())
 
+"M"
+"MR"
+"MRV"
+"MVR"
+"NONE"
+"OP"
+"R"
+"RM"
+"RMV"
+"RM_"
+"RVM"
+"RVMS"
+"RVSM"
+"VM"
+"VMR"
+"VRM"
+
 (defclass |instruction| ()
-  (|aliasOf|
-   |alt|
-   |arch|
-   |bcstSize|
-   |broadcast|
-   |category|
-   |commutative|
-   |consecutiveLead|
-   |control|
-   |elementSize|
-   |encodingPreference|
-   |encoding|
-   |er|
-   |ext|
-   |fields|
-   |fpuStack|
-   |fpuTop|
-   |groupIndex|
-   |groupPattern|
-   |imm|
-   |implicit|
-   |io|
-   |kmask|
-   |k|
-   |name|
-   |opcodeString|
-   |opcodeValue|
-   |opcode|
-   |operands|
-   |operations|
-   |prefixes|
-   |prefix|
-   |privilege|
-   |rel|
-   |sae|
-   |specialRegs|
-   |tupleType|
-   |volatile|
-   |vsibReg|
-   |vsibSize|
-   |zmask|))
+  (|aliasOf| ;; not used in our current table
+   |alt| ;; this is an alternative form (this info is not needed to encode the instruction)
+   |arch| ;; architecture "ANY" "X64" "X86"
+   |bcstSize| ;; AVX-512 bcast size. Always seems to be -1, huh
+   |broadcast| ;; AVX-512 bcast support
+   |category| ;; instruction categories (see |category| object)
+   |commutative| ;; bitflags of the commutative operands (I think, they save indices, but it's one number)
+   |consecutiveLead| ;; consecutive register leading N other registers (they only have it in x86isa but it's
+   ;; always 0 look into this)
+   |control| ;; control-flow type. "none" "call" "return" "branch" or "jump"
+   |elementSize| ;; What size we are treating the SIMD elements as (so could treat ymm reg as thing of 16bit elements)
+   ;; it's -1 if not applicable
+   |encodingPreference| ;; their doc just says "encoding preference (either nothing or 'EVEX')"
+   ;; it might be that there are multiple valid encodings, and this helps decide.
+   |encoding| ;; encoding (e.g. [MR]). See example encoding values in table below
+   |er| ;; AVX-512 embedded rounding {er}, implies {sae} - T or NIL
+   |ext| ;; ISA extensions required to use this instruction. See the |ext| object
+   |fields| ;; arch dependent opcode information (not used yet)
+   |fpuStack| ;; fpu stack manipulation. "pop" "push" "pop2x" "dec" "inc" or ""
+   |fpuTop| ;; fpu top index manipulation. -1 0 1 2 (funcs that dont manipulate fpu-top have '0'
+   |groupIndex| ;; group index.. no idea what this means. -1 0 1 or 2
+   |groupPattern| ;; group pattern in case the instruction was created for a group. "" "rv" "ry" "xy" or "xyz"
+   |imm| ;; always nil.. not sure why
+   |implicit| ;; indexes of all implicit operands (registers/memory) - seems to be a mask
+   |io| ;; instruction io (cpu flags, states, and other registers)
+   |kmask| ;; AVX-512 merging {k}. T or NIL
+   |k| ;; AVX-512 k function. "" "zeroing" or "blend"
+   |name| ;; instruction name
+   |opcodeString| ;; opcode as specfied in the manual
+   |opcodeValue| ;; opcode as a number (arch dependant) not sure what this is good for
+   |opcode| ;; the object that describes the opcode. See |opcode|
+   |operands| ;; the operands. See 'operand'
+   |operations| ;; not used
+   |prefixes| ;; allowed prefixes
+   |prefix| ;; Instruction Prefix (not the same as allowed prefixes). "" "EVEX" "VEX" "XOP" "3DNOW" or "REX2"
+   |privilege| ;; Privilege-level required to execute the instruction. "L3" or "L0"
+   |rel| ;; Displacement ("sb", "cw", and "cd" parts). 1=cb, 2=cw, 4=cd, -1 means none
+   |sae| ;; AVX-512 suppress all exceptions {sae} support. T or NIL
+   |specialRegs| ;; not used. Apparently its info about read/write to special registers
+   |tupleType| ;; AVX-512 tuple type. See table below
+   |volatile| ;; instruction is volatile and should not be reordered
+   |vsibReg| ;; AVX VSIB register type. "" "xmm" "ymm" "zmm"
+   |vsibSize| ;; AVX VSIB register size. 32, 64, -1
+   |zmask| ;; AVX-512 Zeroing {kz}, implies {k}
+   ))
+
+;;;; AVX-512 tuple type
+;;
+;; ""
+;; "fm"
+;; "fv"
+;; "fvm"
+;; "hv"
+;; "hvm"
+;; "m128"
+;; "movddup"
+;; "none"
+;; "ovm"
+;; "qv"
+;; "qvm"
+;; "t1"
+;; "t1f"
+;; "t1s"
+;; "t2"
+;; "t4"
+;; "t8"
+
+;;;; example encoding values from json
+;;
+;; "M"
+;; "MR"
+;; "MRV"
+;; "MVR"
+;; "NONE"
+;; "OP"
+;; "R"
+;; "RM"
+;; "RMV"
+;; "RM_"
+;; "RVM"
+;; "RVMS"
+;; "RVSM"
+;; "VM"
+;; "VMR"
+;; "VRM"
 
 
 (defclass |operand| ()
