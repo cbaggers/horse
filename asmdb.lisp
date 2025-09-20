@@ -277,7 +277,7 @@
    |l|     ;; EVEX.LL - "128", "256", "512", "LIG", "xy", or "xyz"
    |nd|    ;; EVEX.ND (APX new destionation) - 0 or T
    |nf|    ;; EVEX.NF (no flags. I think APX, avoids writing to flags, nice) - 0 or T
-   |scc|   ;; ===== MISSING ===== Not sure why. Original json suggests it should be there, but isa export doesnt have it
+   |scc|   ;; ===== MISSING ===== Not sure why. Original json suggests it should be there, but isa export doesnt have it - I bodged it in the json file, but we need to fix the js
    |mod|   ;; contraints on modrm.mod - "!(11)", "11", or "xx"
    |modr|  ;; "0", "1", "2", "3", "4", "5", "6", "7", or "r"
    |modm|  ;;  "b" or unbound
