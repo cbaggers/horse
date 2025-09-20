@@ -3,28 +3,193 @@
 (in-package #:asmdb)
 
 (defclass |io| ()
-  (|OF|
-   |SF|
-   |ZF|
+  (|AC|
    |AF|
+   |C0|
+   |C1|
+   |C2|
+   |C3|
+   |CF|
+   |DF|
+   |IF|
+   |MSR|
+   |MXCSR|
+   |OF|
    |PF|
-   |CF|))
+   |SD|
+   |SF|
+   |TF|
+   |XCR|
+   |ZF|))
 
 (defclass |ext| ()
-  (|APX_F|))
+  (|3DNOW|
+   |3DNOW2|
+   |ADX|
+   |AESKLE|
+   |AESNI|
+   |AMX_AVX512|
+   |AMX_BF16|
+   |AMX_COMPLEX|
+   |AMX_FP16|
+   |AMX_FP8|
+   |AMX_INT8|
+   |AMX_MOVRS|
+   |AMX_TF32|
+   |AMX_TILE|
+   |AMX_TRANSPOSE|
+   |APX_F|
+   |AVX|
+   |AVX10_2|
+   |AVX2|
+   |AVX512_BF16|
+   |AVX512_BITALG|
+   |AVX512_BW|
+   |AVX512_CD|
+   |AVX512_DQ|
+   |AVX512_F|
+   |AVX512_FP16|
+   |AVX512_IFMA|
+   |AVX512_VBMI|
+   |AVX512_VBMI2|
+   |AVX512_VL|
+   |AVX512_VNNI|
+   |AVX512_VP2INTERSECT|
+   |AVX512_VPOPCNTDQ|
+   |AVX_IFMA|
+   |AVX_NE_CONVERT|
+   |AVX_VNNI|
+   |AVX_VNNI_INT16|
+   |AVX_VNNI_INT8|
+   |BMI|
+   |BMI2|
+   |CET_IBT|
+   |CET_SS|
+   |CLDEMOTE|
+   |CLFLUSH|
+   |CLFLUSHOPT|
+   |CLWB|
+   |CLZERO|
+   |CMOV|
+   |CMPCCXADD|
+   |CMPXCHG16B|
+   |CMPXCHG8B|
+   |ENQCMD|
+   |F16C|
+   |FMA|
+   |FMA4|
+   |FPU|
+   |FSGSBASE|
+   |FXSR|
+   |GEODE|
+   |GFNI|
+   |HRESET|
+   |I486|
+   |INVLPGB|
+   |KL|
+   |LAHFSAHF|
+   |LWP|
+   |LZCNT|
+   |MCOMMIT|
+   |MMX|
+   |MMX2|
+   |MONITOR|
+   |MONITORX|
+   |MOVBE|
+   |MOVDIR64B|
+   |MOVDIRI|
+   |MOVRS|
+   |MPX|
+   |MSR|
+   |MSRLIST|
+   |MSR_IMM|
+   |OSPKE|
+   |PCLMULQDQ|
+   |PCONFIG|
+   |POPCNT|
+   |PREFETCHI|
+   |PREFETCHW|
+   |PREFETCHWT1|
+   |PTWRITE|
+   |RAO_INT|
+   |RDPID|
+   |RDPRU|
+   |RDRAND|
+   |RDSEED|
+   |RDTSC|
+   |RDTSCP|
+   |RMPQUERY|
+   |RTM|
+   |SEAM|
+   |SERIALIZE|
+   |SEV_ES|
+   |SEV_SNP|
+   |SHA|
+   |SHA512|
+   |SKINIT|
+   |SM3|
+   |SM4|
+   |SMAP|
+   |SMX|
+   |SSE|
+   |SSE2|
+   |SSE3|
+   |SSE4A|
+   |SSE4_1|
+   |SSE4_2|
+   |SSSE3|
+   |SVM|
+   |TBM|
+   |TSE|
+   |TSXLDTRK|
+   |UINTR|
+   |USER_MSR|
+   |VAES|
+   |VMX|
+   |VPCLMULQDQ|
+   |WAITPKG|
+   |WBNOINVD|
+   |WRMSRNS|
+   |XOP|
+   |XSAVE|
+   |XSAVEC|
+   |XSAVEOPT|
+   |XSAVES|))
 
 (defclass |alias| ()
-  (|aliasNames|
+  (|primaryName|
+   |aliasNames|
    |format|))
 
 (defclass |category| ()
-  (|GP|
-   |GP_EXT|))
+  (|AMX|
+   |AVX|
+   |AVX10_2|
+   |AVX512|
+   |CRYPTO_HASH|
+   |FPU|
+   |GP|
+   |GP_EXT|
+   |GP_IN_OUT|
+   |MASK|
+   |MMX|
+   |SIMD|
+   |SSE|
+   |STATE|
+   |SYSTEM|
+   |VIRTUALIZATION|))
 
 (defclass |prefixes| ()
-  (|lock|
+  (|bnd|
+   |ilock|
+   |lock|
+   |repIgnore|
+   |repne|
+   |rep|
+   |xacqrel|
    |xacquire|
    |xrelease|))
+
 
 (defclass |special-regs| () ())
 
@@ -112,6 +277,7 @@
    |scc|
    |mod|
    |modr|
+   |modm|
    |modrm|))
 
 (defparameter *x64*
