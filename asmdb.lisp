@@ -197,75 +197,304 @@
 (defclass |special-regs| () ())
 
 (defclass |instruction| ()
-  (|name|
-   |arch|
-   |encoding|
-   |operands|
-   |implicit|
-   |commutative|
-   |opcodeString|
-   |opcodeValue|
-   |fields|
-   |operations|
-   |io|
-   |ext|
-   |category|
-   |specialRegs|
+  (|aliasOf|
    |alt|
-   |volatile|
-   |control|
-   |privilege|
-   |aliasOf|
-   |opcode|
-   |prefix|
-   |groupPattern|
-   |groupIndex|
-   |rel|
-   |fpuTop|
-   |fpuStack|
-   |vsibReg|
-   |vsibSize|
-   |broadcast|
+   |arch|
    |bcstSize|
-   |k|
-   |kmask|
-   |zmask|
-   |er|
-   |sae|
-   |tupleType|
+   |broadcast|
+   |category|
+   |commutative|
+   |consecutiveLead|
+   |control|
    |elementSize|
    |encodingPreference|
-   |consecutiveLead|
-   |prefixes|
-   |imm|
-   ))
-
-(defclass |operand| ()
-  (|prototype|
-   |type|
-   |data|
-   |flags|
-   |reg|
-   |mem|
-   |imm|
-   |rel|
-   |restrict|
-   |read|
-   |write|
-   |regType|
-   |regIndexRel|
-   |memSize|
-   |immSign|
-   |immValue|
-   |rwxIndex|
-   |rwxWidth|
+   |encoding|
+   |er|
+   |ext|
+   |fields|
+   |fpuStack|
+   |fpuTop|
+   |groupIndex|
    |groupPattern|
-   |memSegment|
-   |memOff|
-   |memFar|
+   |imm|
+   |implicit|
+   |io|
+   |kmask|
+   |k|
+   |name|
+   |opcodeString|
+   |opcodeValue|
+   |opcode|
+   |operands|
+   |operations|
+   |prefixes|
+   |prefix|
+   |privilege|
+   |rel|
+   |sae|
+   |specialRegs|
+   |tupleType|
+   |volatile|
    |vsibReg|
    |vsibSize|
-   |bcstSize|))
+   |zmask|))
+
+
+(defclass |operand| ()
+  (|type| ;; the type of operand - "reg", "reg/mem", "rel", "mem", or "mem/reg"
+   |data| ;; the operand's data (possibly procesed) (see below for table)
+   |flags| ;;  this is an int, that is an enum value. See the flags table below
+   |reg| ;; register descriptor if appropriate. See below for reg table
+   |mem| ;; memory descriptor if appropriate. See below for mem table
+   |imm| ;; Size of immediate operand, if appropriate. 0 4 8 16 32 or 64
+   |rel| ;; Size of relative displacement, if appropriate. 0 8 16 or 32
+   |restrict| ;; operand is restricted (specific reg or value). Doesnt seem to be used in x86
+   |read| ;; true if operand is a read op from reg/mem
+   |write| ;; true if operand is a write op to reg/mem
+   |regType| ;; register operand's type
+   |regIndexRel| ;; 0 or 1. 1 means the register index is relative to the previous register operand index
+   |memSize| ;; memory operand's size, if appropriate (-1 if not relevent). See below for values in json
+   |immSign| ;; Required sign of immediate - "any", "signed", or "unsigned"
+   |immValue| ;; this is rare. Its 1 if it's an immediate AND only for specific instructions (shift/rotate
+   |rwxIndex| ;; read/write (RWX) index
+   |rwxWidth| ;; read/write (RWX) width
+   |groupPattern| ;; group pattern in case this operand was created from a group. e.g. "rv" "ry" "xy" "xyz"
+   |memSegment| ;; segment specified with register that is used to perform a memory IO. "ds" or "es"
+   |memOff| ;; T if this is a memory operand and uses an absolute offset
+   |memFar| ;; T if memory is a far pointer (includes segment in first two bytes)
+   |vsibReg| ;; AVX VSIB register type. "xmm" "ymm" or "zmm"
+   |vsibSize| ;; AVX VSIB register type. 32, 64, or -1 (-1 means not applicable here)
+   |bcstSize| ;; AVX-512 broadcast size. 16, 32, 64, or -1 (-1 means not applicable here)
+   ))
+
+
+;;;; flags table
+;;
+;; Optional
+;; Implicit
+;; Commutative
+;; ZExt
+;; ReadAccess
+;; WriteAccess
+
+;;;; RegType Table
+;;
+;; "r8"
+;; "r16"
+;; "r32"
+;; "r64"
+;; "sreg"
+;; "creg"
+;; "dreg"
+;; "r8hi"
+;; "bnd"
+;; "st"
+;; "mm"
+;; "xmm"
+;; "ymm"
+;; "zmm"
+;; "k"
+;; "tmm"
+
+;;;; x86 data values
+;; "1"
+;; "ah"
+;; "al"
+;; "ax"
+;; "bnd"
+;; "bnd/mem"
+;; "cl"
+;; "creg"
+;; "cs"
+;; "cx"
+;; "dfv"
+;; "dreg"
+;; "ds"
+;; "dx"
+;; "eax"
+;; "ebx"
+;; "ecx"
+;; "edx"
+;; "es"
+;; "fs"
+;; "gs"
+;; "imm16"
+;; "imm32"
+;; "imm4"
+;; "imm64"
+;; "imm8"
+;; "imms32"
+;; "imms8"
+;; "immu16"
+;; "immu32"
+;; "k"
+;; "k+1"
+;; "k/m16"
+;; "k/m32"
+;; "k/m64"
+;; "k/m8"
+;; "m128"
+;; "m16"
+;; "m16_16"
+;; "m16_32"
+;; "m16_64"
+;; "m16int"
+;; "m256"
+;; "m32"
+;; "m32/r32"
+;; "m32fp"
+;; "m32int"
+;; "m384"
+;; "m512"
+;; "m64"
+;; "m64/r64"
+;; "m64fp"
+;; "m64int"
+;; "m8"
+;; "m80bcd"
+;; "m80dec"
+;; "m80fp"
+;; "mem"
+;; "mib"
+;; "mm"
+;; "mm/m32"
+;; "mm/m64"
+;; "moff16"
+;; "moff32"
+;; "moff64"
+;; "moff8"
+;; "r16"
+;; "r16/m16"
+;; "r32"
+;; "r32/m16"
+;; "r32/m32"
+;; "r32/m8"
+;; "r64"
+;; "r64/m16"
+;; "r64/m64"
+;; "r8"
+;; "r8/m8"
+;; "rax"
+;; "rbx"
+;; "rcx"
+;; "rdx"
+;; "rel16"
+;; "rel32"
+;; "rel8"
+;; "sreg"
+;; "ss"
+;; "st(0)"
+;; "st(i)"
+;; "tmem"
+;; "tmm"
+;; "tmm+1"
+;; "vm32x"
+;; "vm32y"
+;; "vm32z"
+;; "vm64x"
+;; "vm64y"
+;; "vm64z"
+;; "xmm"
+;; "xmm/m128"
+;; "xmm/m16"
+;; "xmm/m32"
+;; "xmm/m64"
+;; "xmm/m8"
+;; "xmm0"
+;; "ymm"
+;; "ymm/m256"
+;; "zmm"
+;; "zmm/m512"
+
+;;;; Reg Table
+;;
+;; "al"
+;; "ax"
+;; "eax"
+;; "rax"
+;; "r8"
+;; "r16"
+;; "r32"
+;; "r64"
+;; "edx"
+;; "rdx"
+;; "dx"
+;; "cx"
+;; "ecx"
+;; "rcx"
+;; "sreg"
+;; "creg"
+;; "dreg"
+;; "ds"
+;; "es"
+;; "ss"
+;; "fs"
+;; "gs"
+;; "cs"
+;; "cl"
+;; "ebx"
+;; "rbx"
+;; "ah"
+;; "bnd"
+;; "st(0)"
+;; "st(i)"
+;; "mm"
+;; "xmm"
+;; "xmm0"
+;; "ymm"
+;; "zmm"
+;; "k"
+;; "tmm"
+
+;;;; Mem Table
+;;
+;; "m8"
+;; "m16"
+;; "m32"
+;; "m64"
+;; "m16_16"
+;; "m16_32"
+;; "m16_64"
+;; "mem"
+;; "moff8"
+;; "moff16"
+;; "moff32"
+;; "moff64"
+;; "m512"
+;; "m128"
+;; "mib"
+;; "m32fp"
+;; "m64fp"
+;; "m80dec"
+;; "m80bcd"
+;; "m16int"
+;; "m32int"
+;; "m64int"
+;; "m80fp"
+;; "m384"
+;; "m256"
+;; "vm32x"
+;; "vm32y"
+;; "vm32z"
+;; "vm64x"
+;; "vm64y"
+;; "vm64z"
+;; "tmem"
+
+;;;; MemSizes Table
+;;
+;; -1  - I think this means it's not a mem-operand
+;; 0
+;; 8
+;; 16
+;; 32
+;; 48
+;; 64
+;; 80
+;; 128
+;; 256
+;; 384
+;; 512
 
 (defclass |opcode| ()
   (|byte|  ;; opcode byte (a single value specified in hex
